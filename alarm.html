@@ -1,0 +1,69 @@
+<html>
+<head>
+<title>Google Map 의 클릭한 좌표값을 알아내자</title>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&libraries=geometry"></script>
+<script> 
+
+var map;
+function initialize() {
+var myLatlng = new google.maps.LatLng(37.577,126.976); 
+var myOptions = {   
+zoom: 18,     
+center: myLatlng,
+mapTypeId: google.maps.MapTypeId.ROADMAP
+}
+
+map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+//클릭했을 때 이벤트
+google.maps.event.addListener(map, 'click', function(event) {
+placeMarker(event.latLng);
+//infowindow.setContent("latLng: " + event.latLng); // 인포윈도우 안에 클릭한 곳위 좌표값을 넣는다.
+infowindow.setContent("좌표:  위도(" + event.latLng.lat() + "), 경도(" + event.latLng.lng() +")");
+infowindow.setPosition(event.latLng);             // 인포윈도우의 위치를 클릭한 곳으로 변경한다.
+//거리 계산해서 알림창 띄우는 코드~~!~
+    var lat1 = 37.577;
+    var lng1 = 126.976;
+    var lat2 = event.latLng.lat();
+    var lng2 = event.latLng.lng();
+
+     function deg2rad(deg) {
+         return deg * (Math.PI/180)
+     }
+      var R = 6371; // Radius of the earth in km
+      var dLat = deg2rad(lat2-lat1);  // deg2rad below
+      var dLon = deg2rad(lng2-lng1);
+       var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2);
+       var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+       var d = Math.round(R * c * 1000); // Distance in km
+     //return d/1000; //m로 환산된 값
+     if(d<=100)
+     {
+        alert("범위(100m) 내에 들어옴! \n현재:" + d + "m 떨어짐")
+     }
+     else{alert("범위를 벗어남")};
+});
+//클릭 했을때 이벤트 끝
+//인포윈도우의 생성
+ var infowindow = new google.maps.InfoWindow(
+ { content: 'Clicked latLng',
+ size: new google.maps.Size(50,50),
+ position: myLatlng 
+ });  
+ infowindow.open(map); 
+} // function initialize() 함수 끝
+
+// 마커 생성 합수
+function placeMarker(location)
+{ 
+var clickedLocation = new google.maps.LatLng(location);
+var marker = new google.maps.Marker({       position: location,        map: map   });
+map.setCenter(location);
+}
+ </script>
+ </head> 
+ 
+ <body onload="initialize()">
+ <div id="map_canvas" style="width:100%; height:100%"></div>
+ </body>
+ </html>
